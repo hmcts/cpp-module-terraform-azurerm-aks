@@ -397,3 +397,8 @@ variable "worker_agents_tags" {
   type        = map(string)
   default     = {}
 }
+variable "only_critical_addons_enabled" {
+  description = "Enabling this option will taint default node pool with CriticalAddonsOnly=true:NoSchedule"
+  type = bool
+  default = false
+}

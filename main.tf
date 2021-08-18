@@ -45,6 +45,7 @@ resource "azurerm_kubernetes_cluster" "main" {
       tags                   = merge(var.tags, var.agents_tags)
       max_pods               = var.agents_max_pods
       enable_host_encryption = var.enable_host_encryption
+      only_critical_addons_enabled = var.only_critical_addons_enabled
     }
   }
 
@@ -66,6 +67,7 @@ resource "azurerm_kubernetes_cluster" "main" {
       tags                   = merge(var.tags, var.agents_tags)
       max_pods               = var.agents_max_pods
       enable_host_encryption = var.enable_host_encryption
+      only_critical_addons_enabled = var.only_critical_addons_enabled
     }
   }
 
