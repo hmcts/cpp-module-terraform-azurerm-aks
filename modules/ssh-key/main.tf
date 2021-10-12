@@ -11,11 +11,6 @@ resource "tls_private_key" "ssh" {
   rsa_bits  = 2048
 }
 
-resource "local_file" "private_key" {
-  content  = tls_private_key.ssh.private_key_pem
-  filename = "./private_ssh_key"
-}
-
 resource "vault_generic_secret" "ssh_private_key" {
   path = var.vault_ssh_key_path_private
 
