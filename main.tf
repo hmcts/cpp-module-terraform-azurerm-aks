@@ -1,6 +1,18 @@
+locals {
+  vault_ssh_key_path_private = "${var.vault_ssh_key_path_root}/${var.cluster_name}/aks_private_key"
+  vault_ssh_key_path_public  = "${var.vault_ssh_key_path_root}/${var.cluster_name}/aks_public_key"
+}
+
+data "vault_generic_secret" "aks_public_key" {
+  count = var.create_ssh_key ? 0 : 1
+  path  = local.vault_ssh_key_path_public
+}
+
 module "ssh-key" {
-  source         = "./modules/ssh-key"
-  public_ssh_key = var.public_ssh_key == "" ? "" : var.public_ssh_key
+  source                     = "./modules/ssh-key"
+  count                      = var.create_ssh_key ? 1 : 0
+  vault_ssh_key_path_private = local.vault_ssh_key_path_private
+  vault_ssh_key_path_public  = local.vault_ssh_key_path_public
 }
 
 resource "azurerm_kubernetes_cluster" "main" {
@@ -18,29 +30,31 @@ resource "azurerm_kubernetes_cluster" "main" {
 
     ssh_key {
       # remove any new lines using the replace interpolation function
-      key_data = replace(var.public_ssh_key == "" ? module.ssh-key.public_ssh_key : var.public_ssh_key, "\n", "")
+      key_data = replace(
+        var.create_ssh_key ? module.ssh-key.0.public_ssh_key : data.vault_generic_secret.aks_public_key.0.data.value, "\n", ""
+      )
     }
   }
 
   dynamic "default_node_pool" {
     for_each = var.enable_auto_scaling == true ? [] : ["default_node_pool_manually_scaled"]
     content {
-      orchestrator_version   = var.orchestrator_version
-      name                   = var.agents_pool_name
-      node_count             = var.agents_count
-      vm_size                = var.agents_size
-      os_disk_size_gb        = var.os_disk_size_gb
-      vnet_subnet_id         = var.vnet_subnet_id
-      enable_auto_scaling    = var.enable_auto_scaling
-      max_count              = null
-      min_count              = null
-      enable_node_public_ip  = var.enable_node_public_ip
-      availability_zones     = var.agents_availability_zones
-      node_labels            = var.agents_labels
-      type                   = var.agents_type
-      tags                   = merge(var.tags, var.agents_tags)
-      max_pods               = var.agents_max_pods
-      enable_host_encryption = var.enable_host_encryption
+      orchestrator_version         = var.orchestrator_version
+      name                         = var.agents_pool_name
+      node_count                   = var.agents_count
+      vm_size                      = var.agents_size
+      os_disk_size_gb              = var.os_disk_size_gb
+      vnet_subnet_id               = var.vnet_subnet_id
+      enable_auto_scaling          = var.enable_auto_scaling
+      max_count                    = null
+      min_count                    = null
+      enable_node_public_ip        = var.enable_node_public_ip
+      availability_zones           = var.agents_availability_zones
+      node_labels                  = var.agents_labels
+      type                         = var.agents_type
+      tags                         = merge(var.tags, var.agents_tags)
+      max_pods                     = var.agents_max_pods
+      enable_host_encryption       = var.enable_host_encryption
       only_critical_addons_enabled = var.only_critical_addons_enabled
     }
   }
@@ -48,21 +62,21 @@ resource "azurerm_kubernetes_cluster" "main" {
   dynamic "default_node_pool" {
     for_each = var.enable_auto_scaling == true ? ["default_node_pool_auto_scaled"] : []
     content {
-      orchestrator_version   = var.orchestrator_version
-      name                   = var.agents_pool_name
-      vm_size                = var.agents_size
-      os_disk_size_gb        = var.os_disk_size_gb
-      vnet_subnet_id         = var.vnet_subnet_id
-      enable_auto_scaling    = var.enable_auto_scaling
-      max_count              = var.agents_max_count
-      min_count              = var.agents_min_count
-      enable_node_public_ip  = var.enable_node_public_ip
-      availability_zones     = var.agents_availability_zones
-      node_labels            = var.agents_labels
-      type                   = var.agents_type
-      tags                   = merge(var.tags, var.agents_tags)
-      max_pods               = var.agents_max_pods
-      enable_host_encryption = var.enable_host_encryption
+      orchestrator_version         = var.orchestrator_version
+      name                         = var.agents_pool_name
+      vm_size                      = var.agents_size
+      os_disk_size_gb              = var.os_disk_size_gb
+      vnet_subnet_id               = var.vnet_subnet_id
+      enable_auto_scaling          = var.enable_auto_scaling
+      max_count                    = var.agents_max_count
+      min_count                    = var.agents_min_count
+      enable_node_public_ip        = var.enable_node_public_ip
+      availability_zones           = var.agents_availability_zones
+      node_labels                  = var.agents_labels
+      type                         = var.agents_type
+      tags                         = merge(var.tags, var.agents_tags)
+      max_pods                     = var.agents_max_pods
+      enable_host_encryption       = var.enable_host_encryption
       only_critical_addons_enabled = var.only_critical_addons_enabled
     }
   }
