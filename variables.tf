@@ -414,3 +414,9 @@ variable "only_critical_addons_enabled" {
   type        = bool
   default     = false
 }
+
+variable "workspace_resource_group_name" {
+  type = string
+  description = "resource grpup where workspace is created"
+  default = null
+}
