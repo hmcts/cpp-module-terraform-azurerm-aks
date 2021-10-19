@@ -160,6 +160,12 @@ resource "azurerm_kubernetes_cluster" "main" {
   tags = var.tags
 }
 
+resource "azurerm_role_assignment" "aks" {
+  scope = azurerm_kubernetes_cluster.main.id
+  role_definition_name = "Monitoring Metrics Publisher"
+  principal_id = azurerm_kubernetes_cluster.main.addon_profile[0].oms_agent[0].oms_agent_identity[0].object_id
+}
+
 resource "azurerm_kubernetes_cluster_node_pool" "main" {
   kubernetes_cluster_id  = azurerm_kubernetes_cluster.main.id
   orchestrator_version   = var.worker_orchestrator_version
@@ -250,6 +256,7 @@ resource "azurerm_monitor_metric_alert" "aks_infra_alert_pod_failed" {
   action {
     action_group_id = data.azurerm_monitor_action_group.platformDev.id
   }
+  depends_on = [azurerm_role_assignment.aks]
 }
 
 resource "azurerm_monitor_metric_alert" "aks_infra_alert_node_limit" {
@@ -275,6 +282,7 @@ resource "azurerm_monitor_metric_alert" "aks_infra_alert_node_limit" {
   action {
     action_group_id = data.azurerm_monitor_action_group.platformDev.id
   }
+  depends_on = [azurerm_role_assignment.aks]
 }
 
 resource "azurerm_monitor_metric_alert" "aks_infra_alert_pod_pending" {
@@ -300,6 +308,8 @@ resource "azurerm_monitor_metric_alert" "aks_infra_alert_pod_pending" {
   action {
     action_group_id = data.azurerm_monitor_action_group.platformDev.id
   }
+
+  depends_on = [azurerm_role_assignment.aks]
 }
 
 resource "azurerm_monitor_metric_alert" "aks_infra_alert_unschedule_pods" {
