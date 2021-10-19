@@ -183,3 +183,159 @@ data "azurerm_log_analytics_workspace" "main" {
   name                = var.cluster_log_analytics_workspace_name
   resource_group_name = var.workspace_resource_group_name
 }
+
+data "azurerm_monitor_action_group" "platformDev" {
+  name = var.action_group_name
+  resource_group_name = var.workspace_resource_group_name
+}
+
+resource "azurerm_monitor_metric_alert" "aks_infra_alert_cpu_usage" {
+  name                = "aks_cpu_usage_greater_than_80_percent"
+  resource_group_name = var.resource_group_name
+  scopes              = [azurerm_kubernetes_cluster.main.id]
+  description         = "Action will be triggered when cpu usage is greater than 80%"
+
+  criteria {
+    metric_namespace = "Microsoft.ContainerService/managedClusters"
+    metric_name      = "node_cpu_usage_percentage"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 80
+  }
+
+  action {
+    action_group_id = data.azurerm_monitor_action_group.platformDev.id
+  }
+}
+
+resource "azurerm_monitor_metric_alert" "aks_infra_alert_disk_usage" {
+  name                = "aks_disk_usage_greater_than_80_percent"
+  resource_group_name = var.resource_group_name
+  scopes              = [azurerm_kubernetes_cluster.main.id]
+  description         = "Action will be triggered when disk usage is greater than 80%"
+
+  criteria {
+    metric_namespace = "Microsoft.ContainerService/managedClusters"
+    metric_name      = "node_disk_usage_percentage"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 80
+  }
+
+  action {
+    action_group_id = data.azurerm_monitor_action_group.platformDev.id
+  }
+}
+
+resource "azurerm_monitor_metric_alert" "aks_infra_alert_pod_failed" {
+  name                = "aks_pod_failed_greater_than_zero"
+  resource_group_name = var.resource_group_name
+  scopes              = [azurerm_kubernetes_cluster.main.id]
+  description         = "Action will be triggered when failed pods are greater than 0"
+
+  criteria {
+    metric_namespace = "Insights.container/pods"
+    metric_name      = "podCount"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 0
+
+    dimension {
+      name = "phase"
+      operator = "Include"
+      values = ["Failed"]
+    }
+  }
+
+  action {
+    action_group_id = data.azurerm_monitor_action_group.platformDev.id
+  }
+}
+
+resource "azurerm_monitor_metric_alert" "aks_infra_alert_node_limit" {
+  name                = "aks_node_count_not_in_ready_state"
+  resource_group_name = var.resource_group_name
+  scopes              = [azurerm_kubernetes_cluster.main.id]
+  description         = "Action will be triggered when node count is notready state is greater than 0"
+
+  criteria {
+    metric_namespace = "Insights.container/nodes"
+    metric_name      = "nodesCount"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 0
+
+    dimension {
+      name = "status"
+      operator = "Include"
+      values = ["NotReady"]
+    }
+  }
+
+  action {
+    action_group_id = data.azurerm_monitor_action_group.platformDev.id
+  }
+}
+
+resource "azurerm_monitor_metric_alert" "aks_infra_alert_pod_pending" {
+  name                = "aks_pod_pending_greater_than_zero"
+  resource_group_name = var.resource_group_name
+  scopes              = [azurerm_kubernetes_cluster.main.id]
+  description         = "Action will be triggered when pending pods are greater than 0"
+
+  criteria {
+    metric_namespace = "Insights.container/pods"
+    metric_name      = "podCount"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 0
+
+    dimension {
+      name = "phase"
+      operator = "Include"
+      values = ["Pending"]
+    }
+  }
+
+  action {
+    action_group_id = data.azurerm_monitor_action_group.platformDev.id
+  }
+}
+
+resource "azurerm_monitor_metric_alert" "aks_infra_alert_unschedule_pods" {
+  name                = "aks_unschedule_pods_greater_than_0"
+  resource_group_name = var.resource_group_name
+  scopes              = [azurerm_kubernetes_cluster.main.id]
+  description         = "Action will be triggered when unscheduled pod count is greater than zero"
+
+  criteria {
+    metric_namespace = "Microsoft.ContainerService/managedClusters"
+    metric_name      = "cluster_autoscaler_unschedulable_pods_count"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 0
+  }
+
+  action {
+    action_group_id = data.azurerm_monitor_action_group.platformDev.id
+  }
+}
+
+resource "azurerm_monitor_metric_alert" "aks_infra_alert_cluster_health" {
+  name                = "aks_cluster_health"
+  resource_group_name = var.resource_group_name
+  scopes              = [azurerm_kubernetes_cluster.main.id]
+  description         = "Action will be triggered when clsuter health is bad"
+
+  criteria {
+    metric_namespace = "Microsoft.ContainerService/managedClusters"
+    metric_name      = "cluster_autoscaler_cluster_safe_to_autoscale"
+    aggregation      = "Average"
+    operator         = "LessThan"
+    threshold        = 1
+  }
+
+  action {
+    action_group_id = data.azurerm_monitor_action_group.platformDev.id
+  }
+}

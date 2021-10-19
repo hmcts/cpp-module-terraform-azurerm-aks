@@ -420,3 +420,9 @@ variable "workspace_resource_group_name" {
   description = "resource grpup where workspace is created"
   default = null
 }
+
+variable "action_group_name" {
+  type = string
+  description = "resource grpup where workspace is created"
+  default = "platformDevNotify"
+}
