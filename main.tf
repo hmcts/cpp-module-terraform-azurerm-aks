@@ -349,3 +349,89 @@ resource "azurerm_monitor_metric_alert" "aks_infra_alert_cluster_health" {
     action_group_id = data.azurerm_monitor_action_group.platformDev.id
   }
 }
+
+resource "azurerm_monitor_scheduled_query_rules_alert" "actual_vs_desired_replica" {
+  name                = "actual_vs_desired_replica_of_pods"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  action {
+    action_group           = [data.azurerm_monitor_action_group.platformDev.id]
+  }
+  data_source_id = azurerm_kubernetes_cluster.main.id
+  description    = "Alert when actual replica of pods is less than desired replcia"
+  enabled        = true
+  query       = <<-QUERY
+  InsightsMetrics
+    | where Name has "kube_deployment_status_replicas_ready"
+    | extend tags=parse_json(Tags)
+    | where tags.k8sNamespace contains "ccm"
+    | where toint(tags.status_replicas_available) < toint(tags.spec_replicas)
+    | distinct tostring(tags.deployment),tostring(tags.k8sNamespace)
+QUERY
+  severity    = 1
+  frequency   = 5
+  time_window = 10
+  trigger {
+    operator  = "GreaterThan"
+    threshold = 0
+  }
+}
+
+resource "azurerm_monitor_scheduled_query_rules_alert" "hpa_desired_replica_less_than_min_replica" {
+  name                = "hpa_desired_replica_less_than_min_replica"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  action {
+    action_group           = [data.azurerm_monitor_action_group.platformDev.id]
+  }
+  data_source_id = azurerm_kubernetes_cluster.main.id
+  description    = "Alert when actual replica of pods is less than minimum replcia of hpa"
+  enabled        = true
+  query       = <<-QUERY
+  InsightsMetrics
+    | where Name has "kube_hpa_status_current_replicas"
+    | extend tags=parse_json(Tags)
+    | where tags.k8sNamespace contains "ccm"
+    | where toint(tags.status_desired_replicas) < toint(tags.spec_min_replicas)
+    | distinct tostring(tags.hpa),tostring(tags.k8sNamespace)
+QUERY
+  severity    = 1
+  frequency   = 5
+  time_window = 10
+  trigger {
+    operator  = "GreaterThan"
+    threshold = 0
+  }
+}
+
+resource "azurerm_monitor_scheduled_query_rules_alert" "hpa_desired_replica_equal_to_max_replica" {
+  name                = "hpa_desired_replica_equal_to_max_replica"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  action {
+    action_group           = [data.azurerm_monitor_action_group.platformDev.id]
+  }
+  data_source_id = azurerm_kubernetes_cluster.main.id
+  description    = "Alert when actual replica of pods is equal to minimum replcia of hpa"
+  enabled        = true
+  query       = <<-QUERY
+  InsightsMetrics
+    | where Name has "kube_hpa_status_current_replicas"
+    | extend tags=parse_json(Tags)
+    | where tags.k8sNamespace contains "ccm"
+    | where toint(tags.status_desired_replicas) == toint(tags.spec_max_replicas)
+    | distinct tostring(tags.hpa),tostring(tags.k8sNamespace)
+QUERY
+  severity    = 3
+  frequency   = 5
+  time_window = 10
+  trigger {
+    operator  = "GreaterThan"
+    threshold = 0
+  }
+}
+
+// deployment, hpa
