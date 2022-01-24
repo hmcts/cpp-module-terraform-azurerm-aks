@@ -182,6 +182,9 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
   max_pods               = var.worker_agents_max_pods
   enable_host_encryption = var.worker_enable_host_encryption
   tags                   = merge(var.tags, var.worker_agents_tags)
+  lifecycle {
+    ignore_changes = [tags["created_by"],tags["created_time"]]
+  }
 }
 
 data "azurerm_log_analytics_workspace" "main" {
