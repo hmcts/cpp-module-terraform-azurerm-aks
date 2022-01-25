@@ -158,6 +158,9 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   tags = var.tags
+  lifecycle {
+    ignore_changes = [tags["created_by"],tags["created_time"]]
+  }
 }
 
 resource "azurerm_role_assignment" "aks" {
