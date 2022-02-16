@@ -164,7 +164,7 @@ resource "azurerm_kubernetes_cluster" "main" {
 }
 
 resource "azurerm_role_assignment" "aks" {
-  count = var.enable_log_analytics_workspace
+  count = var.enable_log_analytics_workspace ? 1 : 0
   scope = azurerm_kubernetes_cluster.main.id
   role_definition_name = "Monitoring Metrics Publisher"
   principal_id = azurerm_kubernetes_cluster.main.addon_profile[0].oms_agent[0].oms_agent_identity[0].object_id
