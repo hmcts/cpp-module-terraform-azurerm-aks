@@ -3,14 +3,8 @@ locals {
   vault_ssh_key_path_public  = "${var.vault_ssh_key_path_root}/${var.cluster_name}/aks_public_key"
 }
 
-data "vault_generic_secret" "aks_public_key" {
-  count = var.create_ssh_key ? 0 : 1
-  path  = local.vault_ssh_key_path_public
-}
-
 module "ssh-key" {
   source                     = "./modules/ssh-key"
-  count                      = var.create_ssh_key ? 1 : 0
   vault_ssh_key_path_private = local.vault_ssh_key_path_private
   vault_ssh_key_path_public  = local.vault_ssh_key_path_public
 }
@@ -30,9 +24,7 @@ resource "azurerm_kubernetes_cluster" "main" {
 
     ssh_key {
       # remove any new lines using the replace interpolation function
-      key_data = replace(
-        var.create_ssh_key ? module.ssh-key.0.public_ssh_key : data.vault_generic_secret.aks_public_key.0.data.value, "\n", ""
-      )
+      key_data = replace(module.ssh-key.public_ssh_key, "\n", "")
     }
   }
 
