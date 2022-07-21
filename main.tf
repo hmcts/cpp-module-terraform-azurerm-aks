@@ -151,15 +151,15 @@ resource "azurerm_kubernetes_cluster" "main" {
 
   tags = var.tags
   lifecycle {
-    ignore_changes = [tags["created_by"],tags["created_time"]]
+    ignore_changes = [tags["created_by"], tags["created_time"]]
   }
 }
 
 resource "azurerm_role_assignment" "aks" {
-  count = var.enable_log_analytics_workspace ? 1 : 0
-  scope = azurerm_kubernetes_cluster.main.id
+  count                = var.enable_log_analytics_workspace ? 1 : 0
+  scope                = azurerm_kubernetes_cluster.main.id
   role_definition_name = "Monitoring Metrics Publisher"
-  principal_id = azurerm_kubernetes_cluster.main.addon_profile[0].oms_agent[0].oms_agent_identity[0].object_id
+  principal_id         = azurerm_kubernetes_cluster.main.addon_profile[0].oms_agent[0].oms_agent_identity[0].object_id
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "main" {
@@ -179,7 +179,29 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
   enable_host_encryption = var.worker_enable_host_encryption
   tags                   = merge(var.tags, var.worker_agents_tags)
   lifecycle {
-    ignore_changes = [tags["created_by"],tags["created_time"]]
+    ignore_changes = [tags["created_by"], tags["created_time"]]
+  }
+}
+
+resource "azurerm_kubernetes_cluster_node_pool" "prometheus" {
+  kubernetes_cluster_id  = azurerm_kubernetes_cluster.main.id
+  orchestrator_version   = var.prometheus_worker_orchestrator_version
+  name                   = var.prometheus_worker_agents_pool_name
+  vm_size                = var.prometheus_worker_agents_size
+  os_disk_size_gb        = var.prometheus_worker_os_disk_size_gb
+  vnet_subnet_id         = var.prometheus_worker_vnet_subnet_id
+  enable_auto_scaling    = var.prometheus_worker_enable_auto_scaling
+  max_count              = var.prometheus_worker_agents_max_count
+  min_count              = var.prometheus_worker_agents_min_count
+  enable_node_public_ip  = var.prometheus_worker_enable_node_public_ip
+  availability_zones     = var.prometheus_worker_agents_availability_zones
+  node_labels            = var.prometheus_worker_agents_labels
+  node_taints            = var.prometheus_worker_node_taints
+  max_pods               = var.prometheus_worker_agents_max_pods
+  enable_host_encryption = var.prometheus_worker_enable_host_encryption
+  tags                   = merge(var.tags, var.prometheus_worker_agents_tags)
+  lifecycle {
+    ignore_changes = [tags["created_by"], tags["created_time"]]
   }
 }
 

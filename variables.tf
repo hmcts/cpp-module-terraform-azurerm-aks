@@ -403,6 +403,103 @@ variable "worker_agents_tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "prometheus_worker_orchestrator_version" {
+  description = "Prometheus Worker agent pool - Specify which Kubernetes release to use for the orchestration layer. The default used is the latest Kubernetes version available in the region"
+  type        = string
+  default     = null
+}
+
+variable "prometheus_worker_agents_pool_name" {
+  description = "The AKS Prometheus worker agentpool (nodepool) name."
+  type        = string
+  default     = "prometheus"
+}
+
+variable "prometheus_worker_agents_size" {
+  default     = "Standard_D8s_v3"
+  description = "The worker agent pool virtual machine size for the Kubernetes agents"
+  type        = string
+}
+
+variable "prometheus_worker_os_disk_size_gb" {
+  description = "Disk size of nodes in GBs."
+  type        = number
+  default     = 200
+}
+
+variable "prometheus_worker_vnet_subnet_id" {
+  description = "(Optional) The ID of a Subnet where the Kubernetes worker Node Pool should exist. Changing this forces a new resource to be created."
+  type        = string
+  default     = null
+}
+
+variable "prometheus_worker_enable_auto_scaling" {
+  description = "Enable worker node pool autoscaling"
+  type        = bool
+  default     = false
+}
+
+variable "prometheus_worker_agents_max_count" {
+  type        = number
+  description = "Maximum number of worker nodes in a pool"
+  default     = null
+}
+
+variable "prometheus_worker_agents_min_count" {
+  type        = number
+  description = "Minimum number of worker nodes in a pool"
+  default     = null
+}
+
+variable "prometheus_worker_enable_node_public_ip" {
+  description = "(Optional) Should nodes in this Node Pool have a Public IP Address? Defaults to false."
+  type        = bool
+  default     = false
+}
+
+variable "prometheus_worker_agents_availability_zones" {
+  description = "(Optional) A list of Availability Zones across which the Node Pool should be spread. Changing this forces a new resource to be created."
+  type        = list(string)
+  default     = null
+}
+
+variable "prometheus_worker_agents_labels" {
+  description = "(Optional) A map of Kubernetes labels which should be applied to nodes in the Prometheus Worker Node Pool. Changing this forces a new resource to be created."
+  type        = map(string)
+  default     = {
+    "nodepool" : "prometheus_worker_node"
+  }
+}
+
+variable "prometheus_worker_node_taints" {
+  description = "(Optional) A map of Kubernetes taints which should be applied to nodes in the Prometheus Prometheus Worker Node Pool. Changing this forces a new resource to be created."
+  type        = list(string)
+  default = [
+    "PrometheusOnly=true:NoSchedule"
+  ]
+}
+
+variable "prometheus_worker_agents_max_pods" {
+  description = "(Optional) The maximum number of pods that can run on each agent. Changing this forces a new resource to be created."
+  type        = number
+  default     = null
+}
+
+variable "prometheus_worker_enable_host_encryption" {
+  description = "Enable Host Encryption for worker node pool. Encryption at host feature must be enabled on the subscription: https://docs.microsoft.com/azure/virtual-machines/linux/disks-enable-host-based-encryption-cli"
+  type        = bool
+  default     = false
+}
+
+variable "prometheus_worker_agents_tags" {
+  description = "(Optional) A mapping of tags to assign to the Prometheus Worker Node Pool."
+  type        = map(string)
+  default     = {
+    "Agent" : "prometheus_worker_agent"
+  }
+}
+
 variable "only_critical_addons_enabled" {
   description = "Enabling this option will taint default node pool with CriticalAddonsOnly=true:NoSchedule"
   type        = bool
@@ -410,7 +507,7 @@ variable "only_critical_addons_enabled" {
 }
 
 variable "workspace_resource_group_name" {
-  type = string
+  type        = string
   description = "resource grpup where workspace is created"
-  default = null
+  default     = null
 }
