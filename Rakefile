@@ -10,7 +10,7 @@ namespace :presteps do
   task :ensure do
     puts "Using dep ensure to install required go packages.\n"
     success = system ("dep ensure")
-    if not success 
+    if not success
       raise "ERROR: Dep ensure failed!\n".red
     end
   end
@@ -41,7 +41,7 @@ end
 namespace :integration do
   task :test do
     success = system ("go test -v ./test/ -timeout 45m")
-    if not success 
+    if not success
       raise "ERROR: Go test failed!\n".red
     end
   end

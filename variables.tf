@@ -467,7 +467,7 @@ variable "prometheus_worker_agents_availability_zones" {
 variable "prometheus_worker_agents_labels" {
   description = "(Optional) A map of Kubernetes labels which should be applied to nodes in the Prometheus Worker Node Pool. Changing this forces a new resource to be created."
   type        = map(string)
-  default     = {
+  default = {
     "nodepool" : "prometheus_worker_node"
   }
 }
@@ -495,7 +495,7 @@ variable "prometheus_worker_enable_host_encryption" {
 variable "prometheus_worker_agents_tags" {
   description = "(Optional) A mapping of tags to assign to the Prometheus Worker Node Pool."
   type        = map(string)
-  default     = {
+  default = {
     "Agent" : "prometheus_worker_agent"
   }
 }
