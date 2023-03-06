@@ -50,11 +50,37 @@ managed_identity_aks_system_name = "MI-TEST-APPS01-SYS-01"
 managed_identity_aks_worker_name = "MI-TEST-APPS01-APP-01"
 nsg_aks_system = {
   name         = "NS-TEST-APPS01-SYS-01"
-  custom_rules = []
+  custom_rules = [
+    {
+      name                       = "Allow_HTTPS_from_INT_Mgmt_ADO_CI"
+      priority                   = 230
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "TCP"
+      source_port_range          = "*"
+      destination_port_range     = "443"
+      source_address_prefixes    = ["10.88.161.0/24"]
+      destination_address_prefix = "*"
+      description                = "Allow HTTPS from Mgmt ADO Slaves"
+    }
+  ]
 }
 nsg_aks_worker = {
   name         = "NS-TEST-APPS01-APP-01"
-  custom_rules = []
+  custom_rules = [
+    {
+      name                       = "Allow_HTTPS_from_INT_Mgmt_ADO_CI"
+      priority                   = 230
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "TCP"
+      source_port_range          = "*"
+      destination_port_range     = "443"
+      source_address_prefixes    = ["10.88.161.0/24"]
+      destination_address_prefix = "*"
+      description                = "Allow HTTPS from Mgmt ADO Slaves"
+    }
+  ]
 }
 role_definition_aks_system_name = "RD-TEST-APPS01-SYS-01"
 acr_name                        = "CRTESTREPO01"
