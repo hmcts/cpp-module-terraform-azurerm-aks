@@ -49,11 +49,11 @@ aks = {
 managed_identity_aks_system_name = "MI-TEST-APPS01-SYS-01"
 managed_identity_aks_worker_name = "MI-TEST-APPS01-APP-01"
 nsg_aks_system = {
-  name = "NS-TEST-APPS01-SYS-01"
+  name         = "NS-TEST-APPS01-SYS-01"
   custom_rules = []
 }
 nsg_aks_worker = {
-  name = "NS-TEST-APPS01-APP-01"
+  name         = "NS-TEST-APPS01-APP-01"
   custom_rules = []
 }
 role_definition_aks_system_name = "RD-TEST-APPS01-SYS-01"
