@@ -8,7 +8,7 @@ enable_log_analytics_workspace = false
 workspace_resource_group_name  = "RG-TEST-INT-01"
 route_table_egress = {
   name                   = "UR-TEST-GATEWAY-APPS01-01"
-  route_prefixes         = ["0.0.0.0/0"]
+  route_prefixes         = ["1.1.1.1/32"]
   next_hop_in_ip_address = ["10.88.112.100"]
 }
 subnet_aks_system = {
