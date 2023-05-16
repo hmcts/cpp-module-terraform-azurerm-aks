@@ -31,7 +31,7 @@ resource "azurerm_virtual_network_peering" "aks_vnet_to_remote_vnet" {
   remote_virtual_network_id = data.azurerm_virtual_network.peering_remote_vnet.id
 }
 
-resource "azurerm_virtual_network_peering" "aks_vnet_to_remote_vnet" {
+resource "azurerm_virtual_network_peering" "aks_remote_vnet_to_aks_vnet" {
   name                      = "VP-VN-MDV-IMZ-01-${upper(azurerm_virtual_network.test_vn.name)}"
   resource_group_name       = "RG-MDV-IMZ-01"
   virtual_network_name      = "VN-MDV-IMZ-01"
