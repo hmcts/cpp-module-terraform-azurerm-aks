@@ -19,25 +19,6 @@ resource "azurerm_virtual_network" "test_vn" {
   resource_group_name = azurerm_resource_group.aks.name
 }
 
-data "azurerm_virtual_network" "peering_remote_vnet" {
-  name                = "VN-MDV-IMZ-01"
-  resource_group_name = "RG-MDV-IMZ-01"
-}
-
-resource "azurerm_virtual_network_peering" "aks_vnet_to_remote_vnet" {
-  name                      = "VP-${upper(azurerm_virtual_network.test_vn.name)}-VN-MDV-IMZ-01"
-  resource_group_name       = azurerm_resource_group.aks.name
-  virtual_network_name      = azurerm_virtual_network.test_vn.name
-  remote_virtual_network_id = data.azurerm_virtual_network.peering_remote_vnet.id
-}
-
-resource "azurerm_virtual_network_peering" "aks_remote_vnet_to_aks_vnet" {
-  name                      = "VP-VN-MDV-IMZ-01-${upper(azurerm_virtual_network.test_vn.name)}"
-  resource_group_name       = "RG-MDV-IMZ-01"
-  virtual_network_name      = "VN-MDV-IMZ-01"
-  remote_virtual_network_id = azurerm_virtual_network.test_vn.id
-}
-
 resource "azurerm_private_dns_zone" "aks" {
   name                = "privatelink.uksouth.azmk8s.io"
   resource_group_name = azurerm_resource_group.aks.name

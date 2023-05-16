@@ -33,11 +33,3 @@ resource "azurerm_subnet_network_security_group_association" "nsg_association_ak
   subnet_id                 = module.subnet_aks_worker.id
   network_security_group_id = module.nsg_aks_worker.network_security_group_id
 }
-resource "azurerm_subnet_route_table_association" "route_table_association_aks_system" {
-  subnet_id      = module.subnet_aks_system.id
-  route_table_id = module.route_table_egress.routetable_id
-}
-resource "azurerm_subnet_route_table_association" "route_table_association_aks_worker" {
-  subnet_id      = module.subnet_aks_worker.id
-  route_table_id = module.route_table_egress.routetable_id
-}
