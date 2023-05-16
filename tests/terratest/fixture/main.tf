@@ -44,7 +44,7 @@ module "aks" {
   orchestrator_version                        = var.aks.orchestrator_version
   cluster_name                                = "${var.aks.cluster_name}-${random_id.prefix.hex}"
   network_plugin                              = "azure"
-  net_profile_outbound_type                   = "userDefinedRouting"
+  net_profile_outbound_type                   = "loadBalancer"
   vnet_subnet_id                              = module.subnet_aks_system.id
   private_dns_zone_id                         = azurerm_private_dns_zone.aks.id
   agents_size                                 = var.aks.agents_size
@@ -113,7 +113,6 @@ module "aks" {
   depends_on = [
     module.subnet_aks_system,
     time_sleep.role_assignment_propagation_wait_aks_system,
-    azurerm_subnet_route_table_association.route_table_association_aks_system,
     azurerm_private_dns_zone.aks,
     azurerm_container_registry.acr
   ]
