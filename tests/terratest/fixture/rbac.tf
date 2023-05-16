@@ -51,5 +51,5 @@ resource "time_sleep" "role_assignment_propagation_wait_aks_system" {
     azurerm_role_assignment.aks_system_managed_identity,
     azurerm_role_assignment.aks_worker_acr,
   ]
-  create_duration = "240s"
+  create_duration = "360s"
 }
