@@ -44,7 +44,7 @@ module "aks" {
   orchestrator_version                        = var.aks.orchestrator_version
   cluster_name                                = "${var.aks.cluster_name}-${random_id.prefix.hex}"
   network_plugin                              = "azure"
-  net_profile_outbound_type                   = "userDefinedRouting"
+  net_profile_outbound_type                   = "loadBalancer"
   vnet_subnet_id                              = module.subnet_aks_system.id
   private_dns_zone_id                         = azurerm_private_dns_zone.aks.id
   agents_size                                 = var.aks.agents_size
