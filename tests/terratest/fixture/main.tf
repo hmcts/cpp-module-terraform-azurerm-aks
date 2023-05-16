@@ -113,7 +113,6 @@ module "aks" {
   depends_on = [
     module.subnet_aks_system,
     time_sleep.role_assignment_propagation_wait_aks_system,
-    azurerm_subnet_route_table_association.route_table_association_aks_system,
     azurerm_private_dns_zone.aks,
     azurerm_container_registry.acr
   ]
