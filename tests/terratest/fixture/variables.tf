@@ -61,25 +61,20 @@ variable "aks_cluster_admins_aad_group_ids" {
 }
 variable "aks" {
   type = object({
-    prefix                             = string
-    kubernetes_version                 = string
-    orchestrator_version               = string
-    cluster_name                       = string
-    agents_size                        = string
-    os_disk_size_gb                    = number
-    agents_min_count                   = number
-    agents_max_count                   = number
-    agents_max_pods                    = number
-    worker_agents_size                 = string
-    worker_os_disk_size_gb             = number
-    worker_agents_min_count            = number
-    worker_agents_max_count            = number
-    worker_agents_max_pods             = number
-    prometheus_worker_agents_size      = string
-    prometheus_worker_os_disk_size_gb  = number
-    prometheus_worker_agents_min_count = number
-    prometheus_worker_agents_max_count = number
-    prometheus_worker_agents_max_pods  = number
+    prefix                  = string
+    kubernetes_version      = string
+    orchestrator_version    = string
+    cluster_name            = string
+    agents_size             = string
+    os_disk_size_gb         = number
+    agents_min_count        = number
+    agents_max_count        = number
+    agents_max_pods         = number
+    worker_agents_size      = string
+    worker_os_disk_size_gb  = number
+    worker_agents_min_count = number
+    worker_agents_max_count = number
+    worker_agents_max_pods  = number
   })
   description = "aks config"
 }
@@ -155,11 +150,6 @@ variable "worker_agents_pool_name" {
   type        = string
   description = "App agent pool name"
   default     = "wrkagentpool"
-}
-variable "prometheus_worker_agents_pool_name" {
-  type        = string
-  description = "App agent pool name"
-  default     = "prometheus"
 }
 variable "acr_name" {
   type        = string
