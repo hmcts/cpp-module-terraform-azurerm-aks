@@ -517,3 +517,14 @@ variable "private_cluster_public_fqdn_enabled" {
   type        = bool
   default     = true
 }
+variable "oidc_issuer_enabled" {
+  description = "Specifies whether a Public FQDN for this Private Cluster should be added."
+  type        = bool
+  default     = false
+}
+
+variable "workload_identity_enabled" {
+  description = "Specifies whether a Public FQDN for this Private Cluster should be added."
+  type        = bool
+  default     = false
+}
