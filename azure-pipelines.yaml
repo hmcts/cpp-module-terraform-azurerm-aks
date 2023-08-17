@@ -16,5 +16,5 @@ extends:
     agentPool: "MDV-ADO-AGENTS-01"
     spnCredentialsVarGroup: "terratest-app-registration"
     azureServiceConnection: "ado_nonlive_service_principal_lab"
-    terratestTimeout: "30"
+    terratestTimeout: "60"
     tfversion: 1.0.1
