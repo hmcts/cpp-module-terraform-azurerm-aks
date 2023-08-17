@@ -1,11 +1,11 @@
 output "test_aks_id" {
   sensitive = true
-  value = module.aks.aks_id
+  value     = module.aks.aks_id
 }
 
 output "test_admin_host" {
   sensitive = true
-  value = module.aks.admin_host
+  value     = module.aks.admin_host
 }
 
 output "test_kube_raw" {
