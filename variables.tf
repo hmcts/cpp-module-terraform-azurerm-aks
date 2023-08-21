@@ -511,3 +511,20 @@ variable "workspace_resource_group_name" {
   description = "resource grpup where workspace is created"
   default     = null
 }
+
+variable "private_cluster_public_fqdn_enabled" {
+  description = "Specifies whether a Public FQDN for this Private Cluster should be added."
+  type        = bool
+  default     = true
+}
+variable "oidc_issuer_enabled" {
+  description = "Specifies whether a Public FQDN for this Private Cluster should be added."
+  type        = bool
+  default     = false
+}
+
+variable "workload_identity_enabled" {
+  description = "Specifies whether a Public FQDN for this Private Cluster should be added."
+  type        = bool
+  default     = false
+}

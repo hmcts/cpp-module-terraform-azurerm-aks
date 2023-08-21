@@ -49,7 +49,7 @@ module "aks" {
   private_dns_zone_id                         = azurerm_private_dns_zone.aks.id
   agents_size                                 = var.aks.agents_size
   os_disk_size_gb                             = var.aks.os_disk_size_gb
-  sku_tier                                    = "Paid"
+  sku_tier                                    = "Standard"
   enable_role_based_access_control            = true
   rbac_aad_admin_group_object_ids             = var.aks_cluster_admins_aad_group_ids
   rbac_aad_managed                            = true

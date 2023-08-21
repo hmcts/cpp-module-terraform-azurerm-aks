@@ -10,14 +10,17 @@ module "ssh-key" {
 }
 
 resource "azurerm_kubernetes_cluster" "main" {
-  name                    = var.cluster_name == null ? "${var.prefix}-aks" : var.cluster_name
-  kubernetes_version      = var.kubernetes_version
-  location                = var.location
-  resource_group_name     = var.resource_group_name
-  dns_prefix              = var.prefix
-  sku_tier                = var.sku_tier
-  private_cluster_enabled = var.private_cluster_enabled
-  private_dns_zone_id     = var.private_dns_zone_id
+  name                                = var.cluster_name == null ? "${var.prefix}-aks" : var.cluster_name
+  kubernetes_version                  = var.kubernetes_version
+  location                            = var.location
+  resource_group_name                 = var.resource_group_name
+  dns_prefix                          = var.prefix
+  sku_tier                            = var.sku_tier
+  private_cluster_enabled             = var.private_cluster_enabled
+  private_dns_zone_id                 = var.private_dns_zone_id
+  private_cluster_public_fqdn_enabled = var.private_cluster_public_fqdn_enabled
+  oidc_issuer_enabled                 = var.oidc_issuer_enabled
+  workload_identity_enabled           = var.workload_identity_enabled
 
   linux_profile {
     admin_username = var.admin_username
@@ -41,7 +44,7 @@ resource "azurerm_kubernetes_cluster" "main" {
       max_count                    = null
       min_count                    = null
       enable_node_public_ip        = var.enable_node_public_ip
-      availability_zones           = var.agents_availability_zones
+      zones                        = var.agents_availability_zones
       node_labels                  = var.agents_labels
       type                         = var.agents_type
       tags                         = merge(var.tags, var.agents_tags)
@@ -63,7 +66,7 @@ resource "azurerm_kubernetes_cluster" "main" {
       max_count                    = var.agents_max_count
       min_count                    = var.agents_min_count
       enable_node_public_ip        = var.enable_node_public_ip
-      availability_zones           = var.agents_availability_zones
+      zones                        = var.agents_availability_zones
       node_labels                  = var.agents_labels
       type                         = var.agents_type
       tags                         = merge(var.tags, var.agents_tags)
@@ -84,8 +87,8 @@ resource "azurerm_kubernetes_cluster" "main" {
   dynamic "identity" {
     for_each = var.client_id == "" || var.client_secret == "" ? ["identity"] : []
     content {
-      type                      = var.identity_type
-      user_assigned_identity_id = var.user_assigned_identity_id
+      type         = var.identity_type
+      identity_ids = [var.user_assigned_identity_id]
     }
   }
 
@@ -98,44 +101,33 @@ resource "azurerm_kubernetes_cluster" "main" {
     }
   }
 
-  addon_profile {
-    http_application_routing {
-      enabled = var.enable_http_application_routing
-    }
+  http_application_routing_enabled = var.enable_http_application_routing
+  azure_policy_enabled             = var.enable_azure_policy
 
-    kube_dashboard {
-      enabled = var.enable_kube_dashboard
-    }
-
-    azure_policy {
-      enabled = var.enable_azure_policy
-    }
-
-    oms_agent {
-      enabled                    = var.enable_log_analytics_workspace
+  dynamic "oms_agent" {
+    for_each = var.enable_log_analytics_workspace ? ["oms_agent"] : []
+    content {
       log_analytics_workspace_id = var.enable_log_analytics_workspace ? data.azurerm_log_analytics_workspace.main[0].id : null
     }
   }
 
-  role_based_access_control {
-    enabled = var.enable_role_based_access_control
+  role_based_access_control_enabled = var.enable_role_based_access_control
 
-    dynamic "azure_active_directory" {
-      for_each = var.enable_role_based_access_control && var.rbac_aad_managed ? ["rbac"] : []
-      content {
-        managed                = true
-        admin_group_object_ids = var.rbac_aad_admin_group_object_ids
-      }
+  dynamic "azure_active_directory_role_based_access_control" {
+    for_each = var.enable_role_based_access_control && var.rbac_aad_managed ? ["rbac"] : []
+    content {
+      managed                = true
+      admin_group_object_ids = var.rbac_aad_admin_group_object_ids
     }
+  }
 
-    dynamic "azure_active_directory" {
-      for_each = var.enable_role_based_access_control && !var.rbac_aad_managed ? ["rbac"] : []
-      content {
-        managed           = false
-        client_app_id     = var.rbac_aad_client_app_id
-        server_app_id     = var.rbac_aad_server_app_id
-        server_app_secret = var.rbac_aad_server_app_secret
-      }
+  dynamic "azure_active_directory_role_based_access_control" {
+    for_each = var.enable_role_based_access_control && !var.rbac_aad_managed ? ["rbac"] : []
+    content {
+      managed           = false
+      client_app_id     = var.rbac_aad_client_app_id
+      server_app_id     = var.rbac_aad_server_app_id
+      server_app_secret = var.rbac_aad_server_app_secret
     }
   }
 
@@ -159,7 +151,7 @@ resource "azurerm_role_assignment" "aks" {
   count                = var.enable_log_analytics_workspace ? 1 : 0
   scope                = azurerm_kubernetes_cluster.main.id
   role_definition_name = "Monitoring Metrics Publisher"
-  principal_id         = azurerm_kubernetes_cluster.main.addon_profile[0].oms_agent[0].oms_agent_identity[0].object_id
+  principal_id         = azurerm_kubernetes_cluster.main.oms_agent[0].oms_agent_identity[0].object_id
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "main" {
@@ -173,7 +165,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
   max_count              = var.worker_agents_max_count
   min_count              = var.worker_agents_min_count
   enable_node_public_ip  = var.worker_enable_node_public_ip
-  availability_zones     = var.worker_agents_availability_zones
+  zones                  = var.worker_agents_availability_zones
   node_labels            = var.worker_agents_labels
   max_pods               = var.worker_agents_max_pods
   enable_host_encryption = var.worker_enable_host_encryption
@@ -194,7 +186,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "prometheus" {
   max_count              = var.prometheus_worker_agents_max_count
   min_count              = var.prometheus_worker_agents_min_count
   enable_node_public_ip  = var.prometheus_worker_enable_node_public_ip
-  availability_zones     = var.prometheus_worker_agents_availability_zones
+  zones                  = var.prometheus_worker_agents_availability_zones
   node_labels            = var.prometheus_worker_agents_labels
   node_taints            = var.prometheus_worker_node_taints
   max_pods               = var.prometheus_worker_agents_max_pods
