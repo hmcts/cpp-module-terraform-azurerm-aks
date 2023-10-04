@@ -528,3 +528,15 @@ variable "workload_identity_enabled" {
   type        = bool
   default     = false
 }
+
+variable "secret_rotation_enabled" {
+  description = "Specifies whether the Azure Key Vault provider should be enabled."
+  type        = bool
+  default     = false
+}
+
+variable "secret_rotation_interval" {
+  description = "The interval to poll for secret rotation."
+  type        = string
+  default     = null
+}

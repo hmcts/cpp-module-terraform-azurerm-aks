@@ -141,6 +141,14 @@ resource "azurerm_kubernetes_cluster" "main" {
     service_cidr       = var.net_profile_service_cidr
   }
 
+  dynamic "key_vault_secrets_provider" {
+    for_each = var.secret_rotation_enabled ? [1] : []
+    content {
+      secret_rotation_enabled  = var.secret_rotation_enabled
+      secret_rotation_interval = var.secret_rotation_interval
+    }
+  }
+
   tags = var.tags
   lifecycle {
     ignore_changes = [tags["created_by"], tags["created_time"]]
