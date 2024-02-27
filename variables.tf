@@ -200,6 +200,12 @@ variable "network_policy" {
   default     = null
 }
 
+variable "ebpf_data_plane" {
+  description = " Optional) Specifies the eBPF data plane used for building the Kubernetes network. Possible value is cilium. Disabling this forces a new resource to be created."
+  type        = string
+  default     = null
+}
+
 variable "net_profile_dns_service_ip" {
   description = "(Optional) IP address within the Kubernetes service address range that will be used by cluster service discovery (kube-dns). Changing this forces a new resource to be created."
   type        = string

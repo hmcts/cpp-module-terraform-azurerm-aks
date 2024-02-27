@@ -40,6 +40,7 @@ resource "azurerm_kubernetes_cluster" "main" {
       vm_size                      = var.agents_size
       os_disk_size_gb              = var.os_disk_size_gb
       vnet_subnet_id               = var.vnet_subnet_id
+      pod_subnet_id                = var.vnet_subnet_id
       enable_auto_scaling          = var.enable_auto_scaling
       max_count                    = null
       min_count                    = null
@@ -62,6 +63,7 @@ resource "azurerm_kubernetes_cluster" "main" {
       vm_size                      = var.agents_size
       os_disk_size_gb              = var.os_disk_size_gb
       vnet_subnet_id               = var.vnet_subnet_id
+      pod_subnet_id                = var.vnet_subnet_id
       enable_auto_scaling          = var.enable_auto_scaling
       max_count                    = var.agents_max_count
       min_count                    = var.agents_min_count
@@ -134,6 +136,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   network_profile {
     network_plugin     = var.network_plugin
     network_policy     = var.network_policy
+    ebpf_data_plane    = var.ebpf_data_plane
     dns_service_ip     = var.net_profile_dns_service_ip
     docker_bridge_cidr = var.net_profile_docker_bridge_cidr
     outbound_type      = var.net_profile_outbound_type
