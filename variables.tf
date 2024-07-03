@@ -540,3 +540,9 @@ variable "secret_rotation_interval" {
   type        = string
   default     = null
 }
+
+variable "temporary_name_for_rotation" {
+  description = "Specifies the name of the temporary node pool used to cycle the default node pool for VM resizing."
+  type        = string
+  default     = "tempnodepoolname"
+}

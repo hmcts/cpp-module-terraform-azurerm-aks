@@ -51,6 +51,7 @@ resource "azurerm_kubernetes_cluster" "main" {
       max_pods                     = var.agents_max_pods
       enable_host_encryption       = var.enable_host_encryption
       only_critical_addons_enabled = var.only_critical_addons_enabled
+      temporary_name_for_rotation  = var.temporary_name_for_rotation
     }
   }
 
@@ -73,6 +74,7 @@ resource "azurerm_kubernetes_cluster" "main" {
       max_pods                     = var.agents_max_pods
       enable_host_encryption       = var.enable_host_encryption
       only_critical_addons_enabled = var.only_critical_addons_enabled
+      temporary_name_for_rotation  = var.temporary_name_for_rotation
     }
   }
 
