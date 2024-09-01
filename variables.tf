@@ -546,3 +546,32 @@ variable "temporary_name_for_rotation" {
   type        = string
   default     = "tmpnodepool"
 }
+
+variable "dcr" {
+  description = "A map of data collection rules (DCR) configurations"
+  type = map(object({
+    location = string
+    extensions = list(object({
+      name           = string
+      extension_name = string
+      streams        = list(string)
+      data_collection_settings = object({
+        interval                 = string
+        namespace_filtering_mode = string
+        enable_container_log_v2  = bool
+      })
+    }))
+    queries = map(object({
+      query        = string
+      enable       = bool
+      streams      = list(string)
+      destinations = list(string)
+    }))
+    static_data_flows = list(object({
+      streams      = list(string)
+      destinations = list(string)
+    }))
+  }))
+  default = {
+  }
+}

@@ -215,3 +215,73 @@ data "azurerm_log_analytics_workspace" "main" {
   name                = var.cluster_log_analytics_workspace_name
   resource_group_name = var.workspace_resource_group_name
 }
+
+
+# Conditional creation of Data Collection Rules
+resource "azurerm_monitor_data_collection_rule" "main" {
+  for_each            = var.enable_log_analytics_workspace ? var.dcr : {}
+  name                = each.key
+  location            = each.value.location
+  resource_group_name = azurerm_resource_group.main.name
+  data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.main.id
+
+  destinations {
+    log_analytics {
+      name                  = "main-destination-log"
+      workspace_resource_id = data.azurerm_log_analytics_workspace.main.id
+    }
+  }
+
+  dynamic "data_sources" {
+    for_each = each.value.extensions
+    content {
+      extensions {
+        name           = data_sources.value.name
+        extension_name = data_sources.value.extension_name
+        extension_settings {
+          data_collection_settings {
+            interval                  = data_sources.value.data_collection_settings.interval
+            namespace_filtering_mode  = data_sources.value.data_collection_settings.namespace_filtering_mode
+            enable_container_log_v2   = data_sources.value.data_collection_settings.enable_container_log_v2
+          }
+        }
+        streams = data_sources.value.streams
+      }
+    }
+  }
+
+  dynamic "data_flows" {
+    for_each = {
+      for idx, query in each.value.queries : idx => query if query.enable
+    }
+    content {
+      streams      = data_flows.value.streams
+      destinations = data_flows.value.destinations
+      transform_kql = data_flows.value.query
+    }
+  }
+
+  dynamic "static_data_flows" {
+    for_each = each.value.static_data_flows
+    content {
+      streams      = static_data_flows.value.streams
+      destinations = static_data_flows.value.destinations
+    }
+  }
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.main.id]
+  }
+
+  description = "Main Data Collection Rule"
+
+  tags = {
+    environment = "production"
+  }
+
+  depends_on = [
+    azurerm_log_analytics_workspace.main
+  ]
+}
+
