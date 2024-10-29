@@ -22,13 +22,6 @@ resource "azurerm_kubernetes_cluster" "main" {
   oidc_issuer_enabled                 = var.oidc_issuer_enabled
   workload_identity_enabled           = var.workload_identity_enabled
 
-  addon_profile {
-    oms_agent {
-      enabled                    = true
-      log_analytics_workspace_id = azurerm_log_analytics_workspace.log_analytics_workspace.id
-      useAADAuth                 = "true"
-    }
-  }
   linux_profile {
     admin_username = var.admin_username
 
@@ -116,7 +109,8 @@ resource "azurerm_kubernetes_cluster" "main" {
   dynamic "oms_agent" {
     for_each = var.enable_log_analytics_workspace ? ["oms_agent"] : []
     content {
-      log_analytics_workspace_id = var.enable_log_analytics_workspace ? data.azurerm_log_analytics_workspace.main[0].id : null
+      log_analytics_workspace_id      = var.enable_log_analytics_workspace ? data.azurerm_log_analytics_workspace.main[0].id : null
+      msi_auth_for_monitoring_enabled = true
     }
   }
 
