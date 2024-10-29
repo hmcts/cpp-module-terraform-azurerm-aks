@@ -162,7 +162,7 @@ resource "azurerm_role_assignment" "aks" {
   count                = var.enable_log_analytics_workspace ? 1 : 0
   scope                = azurerm_kubernetes_cluster.main.id
   role_definition_name = "Monitoring Metrics Publisher"
-  principal_id         = length(azurerm_kubernetes_cluster.main.oms_agent) > 0 ? azurerm_kubernetes_cluster.main.oms_agent[0].oms_agent_identity[0].object_id : null
+  principal_id         = length(azurerm_kubernetes_cluster.main.oms_agent) > 0 && length(azurerm_kubernetes_cluster.main.oms_agent[0].oms_agent_identity) > 0 ? azurerm_kubernetes_cluster.main.oms_agent[0].oms_agent_identity[0].object_id : null
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "main" {
