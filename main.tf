@@ -213,5 +213,3 @@ data "azurerm_log_analytics_workspace" "main" {
   name                = var.cluster_log_analytics_workspace_name
   resource_group_name = var.workspace_resource_group_name
 }
-
-
