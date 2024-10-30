@@ -113,6 +113,12 @@ resource "azurerm_kubernetes_cluster" "main" {
       msi_auth_for_monitoring_enabled = true
     }
   }
+  # oms_agent_identity = [
+  #       {
+  #         client_id                 = "566bb3ac-d813-4d7a-bad3-9f15ffb"
+  #         object_id                 = "213c591a-09d8-430b-a8148f5f4"
+  #         user_assigned_identity_id = "/subscriptions/e6b5053b-4c38-447-a025aeb3d8c7/resourcegroups/MC_RG-SIT-CS01-CL02_K8-SIT-CS01-CL02_uksouth/providers/Microsoft.ManagedIdentity/userAssignedIdentities/omsagent-k8-sit-cs01-cl02"
+  #       } ]
 
   role_based_access_control_enabled = var.enable_role_based_access_control
 
@@ -162,7 +168,7 @@ resource "azurerm_role_assignment" "aks" {
   count                = var.enable_log_analytics_workspace && length(azurerm_kubernetes_cluster.main.oms_agent[0].oms_agent_identity) > 0 ? 1 : 0
   scope                = azurerm_kubernetes_cluster.main.id
   role_definition_name = "Monitoring Metrics Publisher"
-  principal_id         = azurerm_kubernetes_cluster.main.oms_agent[0].oms_agent_identity[0].object_id
+  principal_id         = var.enable_log_analytics_workspace && length(azurerm_kubernetes_cluster.main.oms_agent[0].oms_agent_identity) > 0 ? azurerm_kubernetes_cluster.main.oms_agent[0].oms_agent_identity[0].object_id : null
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "main" {
