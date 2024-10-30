@@ -110,7 +110,7 @@ resource "azurerm_kubernetes_cluster" "main" {
     for_each = var.enable_log_analytics_workspace ? ["oms_agent"] : []
     content {
       log_analytics_workspace_id      = var.enable_log_analytics_workspace ? data.azurerm_log_analytics_workspace.main[0].id : null
-      msi_auth_for_monitoring_enabled = true
+      msi_auth_for_monitoring_enabled = false
     }
   }
   # oms_agent_identity = [
