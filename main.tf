@@ -40,16 +40,16 @@ resource "azurerm_kubernetes_cluster" "main" {
       vm_size                      = var.agents_size
       os_disk_size_gb              = var.os_disk_size_gb
       vnet_subnet_id               = var.vnet_subnet_id
-      enable_auto_scaling          = var.enable_auto_scaling
+      auto_scaling_enabled         = var.enable_auto_scaling
       max_count                    = null
       min_count                    = null
-      enable_node_public_ip        = var.enable_node_public_ip
+      node_public_ip_enabled       = var.enable_node_public_ip
       zones                        = var.agents_availability_zones
       node_labels                  = var.agents_labels
       type                         = var.agents_type
       tags                         = merge(var.tags, var.agents_tags)
       max_pods                     = var.agents_max_pods
-      enable_host_encryption       = var.enable_host_encryption
+      host_encryption_enabled      = var.enable_host_encryption
       only_critical_addons_enabled = var.only_critical_addons_enabled
       temporary_name_for_rotation  = var.temporary_name_for_rotation
     }
@@ -63,16 +63,16 @@ resource "azurerm_kubernetes_cluster" "main" {
       vm_size                      = var.agents_size
       os_disk_size_gb              = var.os_disk_size_gb
       vnet_subnet_id               = var.vnet_subnet_id
-      enable_auto_scaling          = var.enable_auto_scaling
+      auto_scaling_enabled         = var.enable_auto_scaling
       max_count                    = var.agents_max_count
       min_count                    = var.agents_min_count
-      enable_node_public_ip        = var.enable_node_public_ip
+      node_public_ip_enabled       = var.enable_node_public_ip
       zones                        = var.agents_availability_zones
       node_labels                  = var.agents_labels
       type                         = var.agents_type
       tags                         = merge(var.tags, var.agents_tags)
       max_pods                     = var.agents_max_pods
-      enable_host_encryption       = var.enable_host_encryption
+      host_encryption_enabled      = var.enable_host_encryption
       only_critical_addons_enabled = var.only_critical_addons_enabled
       temporary_name_for_rotation  = var.temporary_name_for_rotation
     }
@@ -118,29 +118,17 @@ resource "azurerm_kubernetes_cluster" "main" {
   dynamic "azure_active_directory_role_based_access_control" {
     for_each = var.enable_role_based_access_control && var.rbac_aad_managed ? ["rbac"] : []
     content {
-      managed                = true
       admin_group_object_ids = var.rbac_aad_admin_group_object_ids
     }
   }
 
-  dynamic "azure_active_directory_role_based_access_control" {
-    for_each = var.enable_role_based_access_control && !var.rbac_aad_managed ? ["rbac"] : []
-    content {
-      managed           = false
-      client_app_id     = var.rbac_aad_client_app_id
-      server_app_id     = var.rbac_aad_server_app_id
-      server_app_secret = var.rbac_aad_server_app_secret
-    }
-  }
-
   network_profile {
-    network_plugin     = var.network_plugin
-    network_policy     = var.network_policy
-    dns_service_ip     = var.net_profile_dns_service_ip
-    docker_bridge_cidr = var.net_profile_docker_bridge_cidr
-    outbound_type      = var.net_profile_outbound_type
-    pod_cidr           = var.net_profile_pod_cidr
-    service_cidr       = var.net_profile_service_cidr
+    network_plugin = var.network_plugin
+    network_policy = var.network_policy
+    dns_service_ip = var.net_profile_dns_service_ip
+    outbound_type  = var.net_profile_outbound_type
+    pod_cidr       = var.net_profile_pod_cidr
+    service_cidr   = var.net_profile_service_cidr
   }
 
   dynamic "key_vault_secrets_provider" {
@@ -165,43 +153,43 @@ resource "azurerm_role_assignment" "aks" {
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "main" {
-  kubernetes_cluster_id  = azurerm_kubernetes_cluster.main.id
-  orchestrator_version   = var.worker_orchestrator_version
-  name                   = var.worker_agents_pool_name
-  vm_size                = var.worker_agents_size
-  os_disk_size_gb        = var.worker_os_disk_size_gb
-  vnet_subnet_id         = var.worker_vnet_subnet_id
-  enable_auto_scaling    = var.worker_enable_auto_scaling
-  max_count              = var.worker_agents_max_count
-  min_count              = var.worker_agents_min_count
-  enable_node_public_ip  = var.worker_enable_node_public_ip
-  zones                  = var.worker_agents_availability_zones
-  node_labels            = var.worker_agents_labels
-  max_pods               = var.worker_agents_max_pods
-  enable_host_encryption = var.worker_enable_host_encryption
-  tags                   = merge(var.tags, var.worker_agents_tags)
+  kubernetes_cluster_id   = azurerm_kubernetes_cluster.main.id
+  orchestrator_version    = var.worker_orchestrator_version
+  name                    = var.worker_agents_pool_name
+  vm_size                 = var.worker_agents_size
+  os_disk_size_gb         = var.worker_os_disk_size_gb
+  vnet_subnet_id          = var.worker_vnet_subnet_id
+  auto_scaling_enabled    = var.worker_enable_auto_scaling
+  max_count               = var.worker_agents_max_count
+  min_count               = var.worker_agents_min_count
+  node_public_ip_enabled  = var.worker_enable_node_public_ip
+  zones                   = var.worker_agents_availability_zones
+  node_labels             = var.worker_agents_labels
+  max_pods                = var.worker_agents_max_pods
+  host_encryption_enabled = var.worker_enable_host_encryption
+  tags                    = merge(var.tags, var.worker_agents_tags)
   lifecycle {
     ignore_changes = [tags["created_by"], tags["created_time"]]
   }
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "prometheus" {
-  kubernetes_cluster_id  = azurerm_kubernetes_cluster.main.id
-  orchestrator_version   = var.prometheus_worker_orchestrator_version
-  name                   = var.prometheus_worker_agents_pool_name
-  vm_size                = var.prometheus_worker_agents_size
-  os_disk_size_gb        = var.prometheus_worker_os_disk_size_gb
-  vnet_subnet_id         = var.prometheus_worker_vnet_subnet_id
-  enable_auto_scaling    = var.prometheus_worker_enable_auto_scaling
-  max_count              = var.prometheus_worker_agents_max_count
-  min_count              = var.prometheus_worker_agents_min_count
-  enable_node_public_ip  = var.prometheus_worker_enable_node_public_ip
-  zones                  = var.prometheus_worker_agents_availability_zones
-  node_labels            = var.prometheus_worker_agents_labels
-  node_taints            = var.prometheus_worker_node_taints
-  max_pods               = var.prometheus_worker_agents_max_pods
-  enable_host_encryption = var.prometheus_worker_enable_host_encryption
-  tags                   = merge(var.tags, var.prometheus_worker_agents_tags)
+  kubernetes_cluster_id   = azurerm_kubernetes_cluster.main.id
+  orchestrator_version    = var.prometheus_worker_orchestrator_version
+  name                    = var.prometheus_worker_agents_pool_name
+  vm_size                 = var.prometheus_worker_agents_size
+  os_disk_size_gb         = var.prometheus_worker_os_disk_size_gb
+  vnet_subnet_id          = var.prometheus_worker_vnet_subnet_id
+  auto_scaling_enabled    = var.prometheus_worker_enable_auto_scaling
+  max_count               = var.prometheus_worker_agents_max_count
+  min_count               = var.prometheus_worker_agents_min_count
+  node_public_ip_enabled  = var.prometheus_worker_enable_node_public_ip
+  zones                   = var.prometheus_worker_agents_availability_zones
+  node_labels             = var.prometheus_worker_agents_labels
+  node_taints             = var.prometheus_worker_node_taints
+  max_pods                = var.prometheus_worker_agents_max_pods
+  host_encryption_enabled = var.prometheus_worker_enable_host_encryption
+  tags                    = merge(var.tags, var.prometheus_worker_agents_tags)
   lifecycle {
     ignore_changes = [tags["created_by"], tags["created_time"]]
   }
