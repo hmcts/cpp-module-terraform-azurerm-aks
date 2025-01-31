@@ -1,3 +1,16 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "3.117.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
 locals {
   vault_ssh_key_path_private = "${var.vault_ssh_key_path_root}/${var.cluster_name}/aks_private_key"
   vault_ssh_key_path_public  = "${var.vault_ssh_key_path_root}/${var.cluster_name}/aks_public_key"
