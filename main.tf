@@ -21,6 +21,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   private_cluster_public_fqdn_enabled = var.private_cluster_public_fqdn_enabled
   oidc_issuer_enabled                 = var.oidc_issuer_enabled
   workload_identity_enabled           = var.workload_identity_enabled
+  cost_analysis_enabled               = true
 
   linux_profile {
     admin_username = var.admin_username
