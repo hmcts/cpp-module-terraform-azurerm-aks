@@ -54,8 +54,8 @@ func TestAksCluster(t *testing.T) {
 		// Managed cluster model https://github.com/Azure/azure-sdk-for-go/blob/v67.0.0/services/containerservice/mgmt/2019-11-01/containerservice/models.go
 		cluster, err := azure.GetManagedClusterE(t, resourceGroupName, expectedClusterName, subscriptionID)
 		require.NoError(t, err)
-		ActualsysAgentPoolName := *(*cluster.ManagedClusterProperties.AgentPoolProfiles)[1].Name
-		ActualsysAgentPoolCount := *(*cluster.ManagedClusterProperties.AgentPoolProfiles)[1].Count
+		ActualsysAgentPoolName := *(*cluster.ManagedClusterProperties.AgentPoolProfiles)[0].Name
+		ActualsysAgentPoolCount := *(*cluster.ManagedClusterProperties.AgentPoolProfiles)[0].Count
 		ActualdnsPrefix := (*cluster.ManagedClusterProperties.DNSPrefix)
 		ActualFqdn := (*cluster.ManagedClusterProperties.PrivateFQDN)
 
