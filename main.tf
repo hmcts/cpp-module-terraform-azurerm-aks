@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "3.117.0"
+    }
+  }
+}
+
 locals {
   vault_ssh_key_path_private = "${var.vault_ssh_key_path_root}/${var.cluster_name}/aks_private_key"
   vault_ssh_key_path_public  = "${var.vault_ssh_key_path_root}/${var.cluster_name}/aks_public_key"
@@ -21,6 +30,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   private_cluster_public_fqdn_enabled = var.private_cluster_public_fqdn_enabled
   oidc_issuer_enabled                 = var.oidc_issuer_enabled
   workload_identity_enabled           = var.workload_identity_enabled
+  cost_analysis_enabled               = true
 
   linux_profile {
     admin_username = var.admin_username
