@@ -60,9 +60,7 @@ func TestAksCluster(t *testing.T) {
 		ActualFqdn := (*cluster.ManagedClusterProperties.PrivateFQDN)
 
 		// Test that cluster properties matches the Terraform specification
-		expectedSysAgentPoolName := "prometheus" // Update to match actual value
-        expectedSysAgentPoolCount := 1 // Update to match actual value
-		
+
 		assert.Equal(t, expectedSysAgentPoolName, ActualsysAgentPoolName)
 		assert.Equal(t, int32(expectedSysAgentPoolCount), ActualsysAgentPoolCount)
 		assert.Equal(t, expectedClusterName, ActualdnsPrefix)
