@@ -546,3 +546,21 @@ variable "temporary_name_for_rotation" {
   type        = string
   default     = "tmpnodepool"
 }
+
+variable "enable_managed_prometheus" {
+  description = "Enable Azure Managed Prometheus for AKS."
+  type        = bool
+  default     = false
+}
+
+variable "monitor_metrics_annotations_allowed" {
+  description = "Comma-separated allow-list of Kubernetes annotations for managed Prometheus scraping."
+  type        = string
+  default     = null
+}
+
+variable "monitor_metrics_labels_allowed" {
+  description = "Comma-separated allow-list of Kubernetes labels for managed Prometheus scraping."
+  type        = string
+  default     = null
+}
