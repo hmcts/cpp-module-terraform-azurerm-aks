@@ -167,11 +167,17 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 }
 
+data "azurerm_client_config" "current" {}
+
 resource "azurerm_role_assignment" "aks" {
   count                = var.enable_log_analytics_workspace ? 1 : 0
   scope                = azurerm_kubernetes_cluster.main.id
   role_definition_name = "Monitoring Metrics Publisher"
-  principal_id         = azurerm_kubernetes_cluster.main.oms_agent[0].oms_agent_identity[0].object_id
+  # Falls back to the caller's object_id when the cluster is being destroyed in the same plan,
+  # since Terraform cannot resolve oms_agent_identity (a computed attribute) for a resource
+  # that's also planned for destroy, and principal_id is a required, non-nullable argument.
+  # The fallback value is never actually used: deletion is keyed off state, not principal_id.
+  principal_id = try(azurerm_kubernetes_cluster.main.oms_agent[0].oms_agent_identity[0].object_id, data.azurerm_client_config.current.object_id)
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "main" {
