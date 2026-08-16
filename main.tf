@@ -161,6 +161,14 @@ resource "azurerm_kubernetes_cluster" "main" {
     }
   }
 
+  dynamic "monitor_metrics" {
+    for_each = var.enable_managed_prometheus ? [1] : []
+    content {
+      annotations_allowed = var.monitor_metrics_annotations_allowed
+      labels_allowed      = var.monitor_metrics_labels_allowed
+    }
+  }
+
   tags = var.tags
   lifecycle {
     ignore_changes = [tags["created_by"], tags["created_time"]]
