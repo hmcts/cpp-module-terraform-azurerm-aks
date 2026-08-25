@@ -104,6 +104,12 @@ variable "enable_log_analytics_workspace" {
   default     = true
 }
 
+variable "oms_agent_msi_auth_for_monitoring_enabled" {
+  type        = bool
+  description = "Use AAD/managed identity auth for the oms_agent addon instead of the legacy Log Analytics agent. Required for the Azure Monitor Agent / Data Collection Rule path (Microsoft-ContainerLogV2 etc.) to receive data."
+  default     = false
+}
+
 variable "vnet_subnet_id" {
   description = "(Optional) The ID of a Subnet where the Kubernetes Node Pool should exist. Changing this forces a new resource to be created."
   type        = string
